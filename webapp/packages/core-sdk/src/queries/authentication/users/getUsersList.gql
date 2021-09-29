@@ -1,0 +1,5 @@
+query getUsersList($userId: ID) {
+  users: listUsers(userId: $userId) {
+    ...AdminUserInfo
+  } 
+}

@@ -1,0 +1,5 @@
+mutation createConnectionFromTemplate($templateId: ID!) {
+  connection: createConnectionFromTemplate(templateId: $templateId) {
+    ...UserConnection
+  }
+}

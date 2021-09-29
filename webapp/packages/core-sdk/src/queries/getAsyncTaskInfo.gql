@@ -1,0 +1,20 @@
+mutation getAsyncTaskInfo(
+    $taskId: String!
+    $removeOnFinish: Boolean!
+) {
+    taskInfo: asyncTaskInfo(
+        id: $taskId
+        removeOnFinish: $removeOnFinish
+    ) {
+        id
+        name
+        running
+        status
+        error {
+            message
+            errorCode
+            stackTrace
+        }
+        taskResult
+    }
+}

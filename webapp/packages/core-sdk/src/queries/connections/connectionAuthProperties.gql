@@ -1,0 +1,7 @@
+query connectionAuthProperties($id: ID!) {
+  connection: connectionInfo(id: $id) {
+    authProperties {
+      ...UserConnectionAuthProperties
+    }
+  }
+}

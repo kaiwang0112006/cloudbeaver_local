@@ -1,0 +1,5 @@
+mutation initConnection($id: ID!, $credentials: Object, $saveCredentials: Boolean) {
+  connection: initConnection(id: $id, credentials: $credentials, saveCredentials: $saveCredentials) {
+    ...UserConnection
+  }
+}

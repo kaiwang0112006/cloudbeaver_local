@@ -1,0 +1,5 @@
+query createConnectionConfiguration($config: ConnectionConfig!) {
+  connection: createConnectionConfiguration(config: $config) {
+    ...AdminConnection
+  }
+}

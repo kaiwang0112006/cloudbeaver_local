@@ -1,0 +1,33 @@
+query serverConfig {
+  serverConfig {
+    name
+    version
+    productConfiguration
+    supportsCustomConnections
+    supportsConnectionBrowser
+    supportsWorkspaces
+    sessionExpireTime
+
+    anonymousAccessEnabled
+    authenticationEnabled
+
+    configurationMode
+    developmentMode
+
+    supportedLanguages {
+      isoCode
+      displayName
+      nativeName
+    }
+    productConfiguration
+    defaultNavigatorSettings {
+      showSystemObjects
+      showUtilityObjects
+      showOnlyEntities
+      mergeEntities
+      hideFolders
+      hideSchemas
+      hideVirtualModel
+    }
+  }
+}

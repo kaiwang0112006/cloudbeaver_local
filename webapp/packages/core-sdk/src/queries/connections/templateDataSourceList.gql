@@ -1,0 +1,16 @@
+query getTemplateConnections {
+  connections: templateConnections {
+    id
+    name
+    description
+    driverId
+    connected
+    readOnly
+
+    authNeeded
+    authModel
+
+    features
+    supportedDataFormats
+  }
+}

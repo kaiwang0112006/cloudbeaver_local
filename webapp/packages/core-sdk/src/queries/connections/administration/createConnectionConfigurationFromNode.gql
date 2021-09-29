@@ -1,0 +1,5 @@
+query createConnectionConfigurationFromNode($nodePath: String!) {
+  connection: copyConnectionConfiguration(nodePath: $nodePath) {
+    ...AdminConnection
+  }
+}

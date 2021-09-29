@@ -1,0 +1,5 @@
+query updateConnectionConfiguration($id: ID!, $config: ConnectionConfig!) {
+  connection: updateConnectionConfiguration(id: $id, config: $config) {
+    ...AdminConnection
+  }
+}

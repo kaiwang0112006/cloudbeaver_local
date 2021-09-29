@@ -1,0 +1,199 @@
+####################################################
+# SQL helpers
+####################################################
+
+type SQLDialectInfo {
+    name: String
+
+    dataTypes: [ String ]
+    functions: [ String ]
+    reservedWords: [ String ]
+    quoteStrings: [ [ String ] ]
+    singleLineComments: [ String ]
+    multiLineComments: [ [ String ] ]
+
+    catalogSeparator: String
+    structSeparator: String
+    scriptDelimiter: String
+
+}
+
+type SQLCompletionProposal {
+    displayString: String
+    type: String
+    score: Int
+
+    replacementString: String
+    replacementOffset: Int
+    replacementLength: Int
+    cursorPosition: Int
+
+    icon: String
+    nodePath: String
+}
+
+####################################################
+# Data read / SQL execution
+####################################################
+
+# SQL context must be created for each SQL editor
+type SQLContextInfo {
+
+    id: ID!
+    defaultCatalog: String
+    defaultSchema: String
+
+}
+
+input SQLDataFilterConstraint {
+    attribute: String!
+    orderPosition: Int
+    orderAsc: Boolean
+
+    criteria: String
+    operator: String
+    value: Object
+}
+
+input SQLDataFilter {
+    # Row offset. We use Float because offset may be bigger than 32 bit.
+    offset: Float
+    limit: Int
+
+    constraints: [ SQLDataFilterConstraint ]
+    where: String
+    orderBy: String
+}
+
+type SQLResultColumn {
+    position: Int!
+    name: String
+    label: String
+    icon: String
+    entityName: String
+
+    dataKind: String
+    typeName: String
+    fullTypeName: String
+    # Column value max length. We use Float because it may be bigger than 32 bit.
+    maxLength: Float
+    scale: Int
+    precision: Int
+
+    readOnly: Boolean!
+    readOnlyStatus: String
+}
+
+type DatabaseDocument {
+    id: String
+    contentType: String
+    properties: Object
+    data: Object
+}
+
+type SQLResultSet {
+    id: ID!
+    columns: [ SQLResultColumn ]
+    rows: [ [ Object ] ]
+    # server always returns hasMoreData = false
+    hasMoreData: Boolean
+}
+
+type SQLQueryResults {
+    title: String
+    updateRowCount: Float
+    sourceQuery: String
+
+    # Actual data format of this result
+    dataFormat: ResultDataFormat
+
+    resultSet: SQLResultSet
+}
+
+type SQLExecuteInfo {
+
+    statusMessage: String
+    duration: Int
+    results: [ SQLQueryResults! ]!
+}
+
+input SQLResultRow {
+    data: [ Object ]!
+    updateValues: Object
+}
+
+extend type Query {
+
+    sqlDialectInfo( connectionId: ID! ): SQLDialectInfo
+
+    sqlListContexts( connectionId: ID! ): [ SQLContextInfo ]
+
+    sqlCompletionProposals(
+        connectionId: ID!,
+        contextId: ID!,
+        query: String!,
+        position: Int!,
+        maxResults: Int
+    ): [ SQLCompletionProposal ]
+
+}
+
+extend type Mutation {
+    sqlContextCreate( connectionId: ID!, defaultCatalog: String, defaultSchema: String ): SQLContextInfo!
+
+    sqlContextSetDefaults( connectionId: ID!, contextId: ID!, defaultCatalog: ID, defaultSchema: ID ): Boolean!
+
+    sqlContextDestroy( connectionId: ID!, contextId: ID! ): Boolean!
+
+    sqlExecuteQuery(
+        connectionId: ID!,
+        contextId: ID!,
+        sql: String!,
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat
+    ): SQLExecuteInfo
+
+    sqlResultClose(connectionId: ID!, contextId: ID!, resultId: ID!): Boolean!
+
+    readDataFromContainer(
+        connectionId: ID!,
+        contextId: ID!,
+        containerNodePath: ID!,
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat
+    ): SQLExecuteInfo
+
+    updateResultsData(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updateRow: [ Object ]!,
+        # Map<Int,Object>
+        updateValues: Object
+    ): SQLExecuteInfo
+
+    updateResultsDataBatch(
+        connectionId: ID!,
+        contextId: ID!,
+        resultsId: ID!,
+
+        updatedRows: [ SQLResultRow! ],
+        deletedRows: [ SQLResultRow! ],
+        addedRows: [ SQLResultRow! ],
+    ): SQLExecuteInfo
+
+    ### Async API
+
+    # Returns SQLExecuteInfo
+    asyncSqlExecuteQuery(
+        connectionId: ID!,
+        contextId: ID!,
+        sql: String!,
+        filter: SQLDataFilter,
+        dataFormat: ResultDataFormat    # requested data format. May be ignored by server
+    ): AsyncTaskInfo!
+
+    asyncSqlExecuteResults(taskId: ID!): SQLExecuteInfo !
+
+}

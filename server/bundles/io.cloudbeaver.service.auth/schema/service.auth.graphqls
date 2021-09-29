@@ -1,0 +1,59 @@
+enum AuthCredentialEncryption {
+    none,
+    plain,
+    hash
+}
+
+type AuthCredentialInfo {
+    id: ID!
+    displayName: String!
+    description: String
+
+    # This field must be shown in admin panel
+    admin: Boolean
+    # This field must be shown in login form
+    user: Boolean
+    possibleValues: [String]
+    encryption: AuthCredentialEncryption
+}
+
+type AuthProviderInfo {
+    id: ID!
+    label: String!
+    icon: ID
+    description: String
+
+    defaultProvider: Boolean
+
+    #configurationParameters: [ObjectPropertyInfo]!
+
+    credentialParameters: [AuthCredentialInfo!]!
+}
+
+type UserAuthInfo {
+    # User unique identifier
+    userId: String!
+    # Human readable display name. May be null
+    displayName: String
+    # Auth provider ID
+    authProvider: String!
+
+    loginTime: DateTime!
+
+    # Optional login message
+    message: String
+
+    origin: ObjectOrigin!
+}
+
+extend type Query {
+
+    authLogin(provider: ID!, credentials: Object!): UserAuthInfo!
+
+    authLogout: Boolean
+
+    sessionUser: UserAuthInfo
+
+    authProviders: [AuthProviderInfo!]!
+
+}
